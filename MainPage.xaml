@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="budget.MainPage">
+    <ScrollView>
+        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Padding="10">
+
+            <!-- Items List Section -->
+            <Border Padding="10" Grid.Column="0" Grid.Row="0" Margin="0,0,10,10">
+                <StackLayout>
+                    <Label x:Name="NameLabel" Text="User Name" FontSize="18" />
+                    <Label Text="Your Items" FontSize="20" HorizontalOptions="Center" />
+                    <Button Text="View Items" FontSize="14" Clicked="OnNavigateToOtherPageClicked" />
+                    <ListView x:Name="ItemsListView" SelectionMode="None" ItemTapped="OnItemTapped" HeightRequest="200">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <StackLayout Orientation="Horizontal" Padding="10">
+                                        <CheckBox IsChecked="{Binding IsSelected}" />
+                                        <Label Text="{Binding Name}" VerticalOptions="Center" />
+                                    </StackLayout>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <Button Text="Delete Selected Items" Clicked="OnDeleteItemClicked" />
+                </StackLayout>
+            </Border>
+
+            <!-- Add Item Section -->
+            <Border Padding="10" Grid.Column="1" Grid.Row="0" Margin="0,0,10,10">
+                <StackLayout>
+                    <Label Text="Add Item" FontSize="20" HorizontalOptions="Center" />
+                    <Entry x:Name="NameEntry" Placeholder="Name" />
+                    <Entry x:Name="DescriptionEntry" Placeholder="Description" />
+                    <Picker x:Name="CategoryEntry" Title="Category" BackgroundColor="LightGray">
+                        <Picker.Items>
+                            <x:String>Bill</x:String>
+                            <x:String>Food</x:String>
+                            <x:String>Extra</x:String>
+                        </Picker.Items>
+                    </Picker>
+                    <Switch x:Name="IsRecurringSwitch" IsToggled="False" />
+                    <Label Text="Recurring Bill?" />
+                    <Picker x:Name="RecurrencePicker" Title="Recurrence Interval" BackgroundColor="LightGray">
+                        <Picker.Items>
+                            <x:String>None</x:String>
+                            <x:String>Quarter</x:String>
+                            <x:String>Semester</x:String>
+                            <x:String>Weekly</x:String>
+                            <x:String>Monthly</x:String>
+                            <x:String>Yearly</x:String>
+                        </Picker.Items>
+                    </Picker>
+                    <DatePicker x:Name="NextDueDatePicker" />
+                    <Entry x:Name="PriorityEntry" Placeholder="Priority" />
+                    <Entry x:Name="EstimatedCostEntry" Placeholder="Estimated Cost" Keyboard="Numeric" />
+                    <DatePicker x:Name="CreatedAtPicker" />
+                    <Picker x:Name="StatusPicker" Title="Status" BackgroundColor="LightGray">
+                        <Picker.Items>
+                            <x:String>Not Paid</x:String>
+                            <x:String>Paid</x:String>
+                        </Picker.Items>
+                    </Picker>
+                    <Button Text="Save Item" Clicked="OnSaveItemClicked" />
+                </StackLayout>
+            </Border>
+
+            <!-- Salary and Savings Section -->
+            <Border Padding="10" Grid.Column="2" Grid.Row="0" Margin="0,0,10,10">
+                <StackLayout>
+                    <Label Text="Enter Salary" FontSize="18" HorizontalOptions="Center" />
+                    <Entry x:Name="SalaryEntry" Placeholder="Enter Salary" Keyboard="Numeric" />
+                    <Button Text="Edit Net Salary" Clicked="OnEditSalaryClicked" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <Label x:Name="RemainingBalanceLabel" Text="Remaining: $" FontSize="16" />
+
+                    <Label Text="Savings Balance" FontSize="18" HorizontalOptions="Center" />
+                    <Label x:Name="SavingsBalanceLabel" Text="Savings: $0.00" FontSize="16" />
+
+                    <Label Text="Save Percentage of Remaining" FontSize="18" HorizontalOptions="Center" />
+                    <Slider x:Name="SavingsSlider" Minimum="0" Maximum="50" Value="10" />
+                    <Label x:Name="SavingsPercentageLabel" Text="{Binding SavingsPercentage}" FontSize="16" />
+                    <Button Text="Apply Savings" Clicked="OnApplySavingsClicked" />
+
+                    <Label x:Name="BalanceLabel" Text="{Binding BalanceText}" FontSize="16" TextColor="Black"/>
+
+                    <Label Text="Distribute Remaining" FontSize="18" HorizontalOptions="Center" />
+                    <Button Text="Per Week" Clicked="OnDistributeWeeklyClicked" />
+                    <Button Text="Per Month" Clicked="OnDistributeMonthlyClicked" />
+                    <Label x:Name="AllowanceLabel" Text="Allowance: $" FontSize="16" />
+                </StackLayout>
+            </Border>
+        </Grid>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:budget.models"
+             x:Class="budget.Itemviewing"
+             Title="Item Viewing">
+
+    <StackLayout Padding="20">
+        <!-- Title -->
+        <Label Text="Items List" FontSize="24" HorizontalOptions="Center" />
+
+        <StackLayout Orientation="Horizontal" Spacing="10" HorizontalOptions="Center">
+            <Button Text="Sort by Name" Clicked="OnSortByNameClicked" />
+            <Button Text="Sort by Priority" Clicked="OnSortByPriorityClicked" />
+            <Button Text="Sort by Estimated Cost" Clicked="OnSortByEstimatedCostClicked" />
+            <Button Text="Sort by Descending Estimated Cost" Clicked="OnSortBysmallerEstimatedCostClicked" />
+        </StackLayout>
+
+        <!-- ListView for displaying items -->
+        <ListView x:Name="ItemsListView" SelectionMode="None" ItemTapped="OnItemTapped">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:Item">
+                    <ViewCell>
+                        <Border BackgroundColor="LightBlue" Padding="10" Margin="5">
+                            <StackLayout>
+                                <Label Text="Name:" FontAttributes="Bold" />
+                                <Label Text="{Binding Name}" />
+
+                                <Label Text="Description:" FontAttributes="Bold" />
+                                <Label Text="{Binding Description}" />
+
+                                <Label Text="Category:" FontAttributes="Bold" />
+                                <Label Text="{Binding Category}" />
+
+                                <Label Text="Priority:" FontAttributes="Bold" />
+                                <Label Text="{Binding Priority}" />
+
+                                <Label Text="Estimated Cost:" FontAttributes="Bold" />
+                                <Label Text="{Binding EstimatedCost, StringFormat='{0:C}'}" />
+
+                                <Label Text="Status:" FontAttributes="Bold" />
+                                <Label Text="{Binding Status}" />
+
+                                <Label Text="Created At:" FontAttributes="Bold" />
+                                <Label Text="{Binding CreatedAt, StringFormat='{0:MM/dd/yyyy}'}" />
+
+                                <Label Text="Photo:" FontAttributes="Bold" />
+                                <Image Source="{Binding PhotoPath}" HeightRequest="100" />
+                            </StackLayout>
+                        </Border>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>

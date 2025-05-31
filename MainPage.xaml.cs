@@ -4,6 +4,8 @@ using Microsoft.Maui.ApplicationModel.Communication;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Item = budget.models.Item;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Controls;
 
 namespace budget
 {
@@ -34,6 +36,7 @@ namespace budget
                 var categories = new List<string> { "Bill", "Food", "Extra" };
 
                 CategoryEntry.ItemsSource = categories;
+
             }
             catch (Exception ex)
             {
@@ -230,22 +233,63 @@ namespace budget
             }
         }
 
-        
+
 
         private async void LoadUserData()
         {
             try
             {
                 string? userId = Preferences.Get("UserId", null);
-                if (string.IsNullOrEmpty(userId))
+                string? userEmail = Preferences.Get("Email", null);
+
+                Debug.WriteLine($"Loaded from preferences: UserId = '{userId}', Email = '{userEmail}'");
+
+                if (string.IsNullOrEmpty(userId) && string.IsNullOrEmpty(userEmail))
                 {
-                    await DisplayAlert("Error", "User ID is not available. Please log in again.", "OK");
+                    await DisplayAlert("Error", "User ID or Email is not available. Please log in again.", "OK");
                     return;
                 }
 
-                var user = await _dbContext.GetUser(userId);
+                AppUser? user = null;
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    user = await _dbContext.GetUser(userId);
+                    Debug.WriteLine(user == null
+                        ? $"No local user found by Id: {userId}"
+                        : $"Local user found by Id: {userId}, Name: {user.FirstName}");
+                }
+
+                if (user == null && !string.IsNullOrEmpty(userEmail))
+                {
+                    user = await _dbContext.GetUserByEmail(userEmail);
+                    Debug.WriteLine(user == null
+                        ? $"No local user found by Email: {userEmail}"
+                        : $"Local user found by Email: {userEmail}, Name: {user.FirstName}");
+                }
+
+                if (user == null && !string.IsNullOrEmpty(userEmail))
+                {
+                    Debug.WriteLine($"Fetching user from API by email: {userEmail}");
+                    user = await _apiService.GetUserFromApiByEmailAsync(userEmail);
+
+                    if (user == null)
+                    {
+                        Debug.WriteLine("User not found on API by email.");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"User fetched from API: {user.FirstName} ({user.Id})");
+                        // Save user locally and update prefs
+                        await _dbContext.CreateUser(user);
+                        Preferences.Set("UserId", user.Id);
+                        Preferences.Set("Email", user.Email);
+                    }
+                }
+
                 if (user == null)
                 {
+                    Debug.WriteLine("User not found anywhere; creating default user.");
                     user = new AppUser
                     {
                         FirstName = "Default User",
@@ -255,13 +299,21 @@ namespace budget
                         LastUpdated = DateTime.Now
                     };
                     await _dbContext.CreateUser(user);
-                    Preferences.Set("Email", user.Email);
+                    Preferences.Set("Email", user.Email ?? "");
+                    Preferences.Set("UserId", user.Id ?? "");
                 }
 
                 double totalExpenses = await CalculateTotalExpenses(user.Id);
 
-                _salary = user.Salary;
-                _remainingBalance = user.Salary - totalExpenses; 
+                _salary = user.Salary > 0 ? user.Salary : 1000;
+
+                if (user.Balance == null)
+                {
+                    user.Balance = 0;
+                    await _dbContext.UpdateUser(user);
+                }
+
+                _remainingBalance = user.Salary - totalExpenses;
 
                 NameLabel.Text = $"Welcome, {user.FirstName}!";
                 SalaryEntry.Text = _salary > 0 ? _salary.ToString("F2") : "";
@@ -273,6 +325,7 @@ namespace budget
                 await DisplayAlert("Error", "An error occurred while loading user data.", "OK");
             }
         }
+
 
         private async Task<double> CalculateTotalExpenses(string userId)
         {
@@ -407,6 +460,7 @@ namespace budget
                         user.Balance = newSalary;
                         user.LastUpdated = DateTime.Now;
                         await _dbContext.UpdateUser(user);
+
                     }
 
                     RemainingBalanceLabel.Text = $"Remaining: ${user.Balance:F2}";
@@ -424,5 +478,6 @@ namespace budget
             }
         }
 
+        
     }
 }

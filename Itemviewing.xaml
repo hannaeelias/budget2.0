@@ -44,8 +44,7 @@
                                 <Label Text="Created At:" FontAttributes="Bold" />
                                 <Label Text="{Binding CreatedAt, StringFormat='{0:MM/dd/yyyy}'}" />
 
-                                <Label Text="Photo:" FontAttributes="Bold" />
-                                <Image Source="{Binding PhotoPath}" HeightRequest="100" />
+      
                             </StackLayout>
                         </Border>
                     </ViewCell>
